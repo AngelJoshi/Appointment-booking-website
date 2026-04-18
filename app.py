@@ -6,7 +6,7 @@ import random, string
 
 # ── App Setup ──────────────────────────────────────────────────────────────────
 app = Flask(__name__)
-app.secret_key = "change-this-to-a-random-secret-key"
+app.secret_key = "my_super_secret_booking_key_7879"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///appointments.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)

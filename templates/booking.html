@@ -82,6 +82,21 @@
     color: var(--gold);
     margin-bottom: 0.2rem;
   }
+  .chip .directions-link {
+    display: inline-block;
+    margin-top: 0.3rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(201,168,76,0.35);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .chip .directions-link:hover {
+    color: var(--gold2);
+    border-color: var(--gold2);
+  }
 
   /* ── Right: Form panel ── */
   .right-panel {
@@ -244,9 +259,9 @@
     <p class="eyebrow">Legal Consultancy &amp; Representation</p>
 
     <h1 class="lawyer-name">
-      Adv.<br><em></em> Ram S. Joshi</em>
+      Adv.<br><em>Ram S. Joshi</em>
     </h1>
-    <p class="lawyer-title">B.Tech. LL.B. </p>
+    <p class="lawyer-title">B.Tech. LL.B.</p>
 
     <div class="gold-line left"></div>
 
@@ -260,7 +275,14 @@
 
     <div class="info-chips">
       <div class="chip"><span>Phone</span>+91 8552855011</div>
-      <div class="chip"><span>Chamber</span>Malegaon Jahangir, Maharashtra</div>
+      <div class="chip">
+        <span>Chamber</span>
+        Malegaon Jahangir, Maharashtra
+        <a href="https://maps.app.goo.gl/pEFyAetvc5DkZXgHA"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="directions-link">Directions ↗</a>
+      </div>
       <div class="chip"><span>Experience</span>20+ Years</div>
     </div>
   </div>
@@ -339,7 +361,6 @@
 
   var dateInput  = document.getElementById('appt_date');
   var slotShell  = document.getElementById('slotShell');
-  var slotMsg    = document.getElementById('slotMsg');
   var hiddenSlot = document.getElementById('appt_slot');
   var submitBtn  = document.getElementById('submitBtn');
 
@@ -394,10 +415,9 @@
     var d = dateInput.value;
     if (!d) return;
 
-    // Reset
     hiddenSlot.value = '';
     submitBtn.disabled = true;
-    setMsg('Loading available slots…');
+    setMsg('Loading available slots\u2026');
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/slots?date=' + encodeURIComponent(d));
