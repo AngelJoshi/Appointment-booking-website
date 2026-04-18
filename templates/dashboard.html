@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Adv. Ram S. Joshi{% endblock %}
+{% block head %}
+<style>
+  .db{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 5rem}
+
+  /* Header */
+  .db-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2.5rem}
+  .db-head h1{font-family:var(--ff-serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:300;color:var(--cream);line-height:1.1}
+  .db-head h1 em{font-style:italic;color:var(--gold2)}
+  .db-head p{font-size:0.68rem;letter-spacing:0.08em;color:var(--muted);margin-top:0.25rem}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);margin-bottom:2rem}
+  .stat{padding:1.25rem 1.5rem;text-align:center;border-right:1px solid var(--border)}
+  .stat:last-child{border-right:none}
+  .stat-n{font-family:var(--ff-serif);font-size:2.2rem;font-weight:300;color:var(--gold2);line-height:1}
+  .stat-l{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:0.3rem}
+
+  /* Filters */
+  .filters{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.5rem}
+  .filter-link{padding:0.35rem 0.9rem;font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;border:1px solid var(--border);color:var(--muted);transition:all 0.2s}
+  .filter-link:hover{border-color:var(--gold);color:var(--gold)}
+  .filter-link.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.07)}
+
+  /* Cards */
+  .appt-list{display:flex;flex-direction:column;gap:0.6rem}
+
+  .appt-card{border:1px solid var(--border);background:rgba(17,32,64,0.3);transition:border-color 0.2s}
+  .appt-card:hover{border-color:rgba(201,168,76,0.35)}
+  .appt-card.status-pending{border-left:2px solid var(--gold)}
+  .appt-card.status-approved{border-left:2px solid #5a9a6a}
+  .appt-card.status-rejected{border-left:2px solid #9a4a4a;opacity:0.65}
+
+  .card-main{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.5rem;padding:1.1rem 1.25rem}
+
+  .card-num{font-family:var(--ff-serif);font-size:1.4rem;font-weight:300;color:rgba(201,168,76,0.3);min-width:2rem;text-align:center}
+
+  .card-info{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem 1.5rem}
+  .ci-label{font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem}
+  .ci-value{font-size:0.8rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ci-value.muted{color:var(--muted);font-size:0.75rem}
+
+  .card-actions{display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;flex-shrink:0}
+
+  /* Badge */
+  .badge{display:inline-block;padding:0.2rem 0.65rem;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+  .badge-pending{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+  .badge-approved{border-color:rgba(90,154,106,0.45);color:#8ecf9e}
+  .badge-rejected{border-color:rgba(154,74,74,0.4);color:#cf8e8e}
+
+  /* Action buttons */
+  .action-row{display:flex;gap:0.35rem}
+  .act-btn{padding:0.28rem 0.75rem;font-family:var(--ff-sans);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border:1px solid;cursor:pointer;background:transparent;transition:all 0.2s;white-space:nowrap}
+  .act-approve{border-color:rgba(90,154,106,0.4);color:#8ecf9e}.act-approve:hover{background:rgba(90,154,106,0.12);border-color:#5a9a6a}
+  .act-reject{border-color:rgba(154,74,74,0.4);color:#cf8e8e}.act-reject:hover{background:rgba(154,74,74,0.12);border-color:#9a4a4a}
+  .act-delete{border-color:rgba(138,155,176,0.2);color:var(--muted)}.act-delete:hover{border-color:rgba(154,74,74,0.4);color:#cf8e8e}
+
+  /* Empty */
+  .empty{text-align:center;padding:4rem 2rem;border:1px solid var(--border)}
+  .empty .icon{font-size:2.5rem;opacity:0.15;display:block;margin-bottom:1.2rem}
+  .empty h3{font-family:var(--ff-serif);font-size:1.5rem;font-weight:300;color:var(--cream);margin-bottom:0.4rem}
+  .empty p{font-size:0.76rem;color:var(--muted)}
+
+  @media(max-width:800px){
+    .card-main{grid-template-columns:1fr;gap:0.8rem}
+    .card-num{display:none}
+    .card-info{grid-template-columns:1fr 1fr}
+    .card-actions{flex-direction:row;align-items:center}
+    .stats{grid-template-columns:1fr}
+    .stat{border-right:none;border-bottom:1px solid var(--border)}
+    .stat:last-child{border-bottom:none}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="db">
+
+  <div class="db-head">
+    <div>
+      <h1>Appointment<br><em>Dashboard</em></h1>
+      <p>Adv. Ram S. Joshi &nbsp;&middot;&nbsp; All scheduled consultations</p>
+    </div>
+    <a href="/book" class="btn btn-outline" target="_blank" style="font-size:0.68rem">View Booking Page ↗</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n">{{ total }}</div>
+      <div class="stat-l">Total Requests</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">{{ pending }}</div>
+      <div class="stat-l">Pending Approval</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">{{ approved }}</div>
+      <div class="stat-l">Approved</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <a href="/dashboard?status=all"      class="filter-link {% if filter_status=='all' %}active{% endif %}">All</a>
+    <a href="/dashboard?status=pending"  class="filter-link {% if filter_status=='pending' %}active{% endif %}">Pending</a>
+    <a href="/dashboard?status=approved" class="filter-link {% if filter_status=='approved' %}active{% endif %}">Approved</a>
+    <a href="/dashboard?status=rejected" class="filter-link {% if filter_status=='rejected' %}active{% endif %}">Rejected</a>
+  </div>
+
+  <!-- Appointment cards -->
+  {% if appointments %}
+  <div class="appt-list">
+    {% for appt in appointments %}
+    <div class="appt-card status-{{ appt.status }}">
+      <div class="card-main">
+
+        <div class="card-num">{{ loop.index }}</div>
+
+        <div class="card-info">
+          <div>
+            <div class="ci-label">Client</div>
+            <div class="ci-value">{{ appt.client_name }}</div>
+          </div>
+          <div>
+            <div class="ci-label">Contact</div>
+            <div class="ci-value muted">{{ appt.contact_no }}</div>
+          </div>
+          <div>
+            <div class="ci-label">Date &amp; Time</div>
+            <div class="ci-value">{{ appt.date_time.strftime('%d %b %Y') }}</div>
+            <div class="ci-value muted" style="font-size:0.7rem">{{ appt.date_time.strftime('%I:%M %p') }}</div>
+          </div>
+          <div>
+            <div class="ci-label">Matter</div>
+            <div class="ci-value">{{ appt.case_type }}</div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <span class="badge badge-{{ appt.status }}">{{ appt.status }}</span>
+          <div class="action-row">
+            {% if appt.status == 'pending' %}
+              <a href="/approve/{{ appt.id }}?from={{ filter_status }}" class="act-btn act-approve">Approve</a>
+              <a href="/reject/{{ appt.id }}?from={{ filter_status }}"  class="act-btn act-reject">Reject</a>
+            {% elif appt.status == 'approved' %}
+              <a href="/reject/{{ appt.id }}?from={{ filter_status }}"  class="act-btn act-reject">Revoke</a>
+            {% elif appt.status == 'rejected' %}
+              <a href="/approve/{{ appt.id }}?from={{ filter_status }}" class="act-btn act-approve">Approve</a>
+            {% endif %}
+            <a href="/delete/{{ appt.id }}"
+               class="act-btn act-delete"
+               onclick="return confirm('Delete appointment for {{ appt.client_name }}?')">Delete</a>
+          </div>
+          <div style="font-size:0.55rem;color:rgba(138,155,176,0.5);letter-spacing:0.08em">{{ appt.ref }}</div>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <span class="icon">⚖</span>
+    <h3>No Appointments Found</h3>
+    <p>{% if filter_status != 'all' %}No {{ filter_status }} appointments. <a href="/dashboard" style="color:var(--gold);text-decoration:none">View all</a>{% else %}Appointments booked through the website will appear here.{% endif %}</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

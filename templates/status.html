@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Check Appointment Status — Adv. Ram S. Joshi{% endblock %}
+{% block head %}
+<style>
+  .status-page{min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem}
+  .status-wrap{width:100%;max-width:520px;animation:fadeUp 0.6s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .status-header{text-align:center;margin-bottom:2.5rem}
+  .status-header .icon{font-size:2.5rem;opacity:0.5;display:block;margin-bottom:1rem}
+  .status-header h1{font-family:var(--ff-serif);font-size:2.2rem;font-weight:300;color:var(--cream);margin-bottom:0.3rem}
+  .status-header p{font-size:0.76rem;color:var(--muted)}
+
+  /* Search form */
+  .search-card{border:1px solid var(--border);padding:2rem;background:rgba(17,32,64,0.4);margin-bottom:2rem}
+  label{display:block;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.45rem}
+  .input-row{display:flex;gap:0.6rem}
+  input[type="text"]{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--cream);padding:0.8rem 1rem;font-family:var(--ff-sans);font-size:0.85rem;font-weight:300;outline:none;transition:border-color 0.25s;letter-spacing:0.1em}
+  input[type="text"]:focus{border-color:var(--gold)}
+  input::placeholder{color:rgba(138,155,176,0.4);letter-spacing:0.04em}
+  .search-btn{padding:0.8rem 1.4rem;background:var(--gold);border:none;cursor:pointer;font-family:var(--ff-sans);font-size:0.7rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--navy);transition:all 0.25s;white-space:nowrap}
+  .search-btn:hover{background:var(--gold2)}
+
+  /* Result card */
+  .result-card{border:1px solid var(--border);background:rgba(17,32,64,0.4);animation:fadeUp 0.5s ease both}
+  .result-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+  .result-ref{font-family:var(--ff-serif);font-size:1.1rem;color:var(--gold2);letter-spacing:0.06em}
+  .result-body{padding:1.5rem}
+
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:1.5rem}
+  .di{border:1px solid var(--border);padding:0.8rem 1rem}
+  .di .dl{font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.25rem}
+  .di .dv{font-size:0.82rem;color:var(--cream)}
+
+  /* Status badges */
+  .badge-status{display:inline-flex;align-items:center;gap:0.5rem;padding:0.3rem 0.9rem;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid}
+  .badge-pending{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+  .badge-approved{border-color:rgba(90,154,106,0.5);color:#8ecf9e}
+  .badge-rejected{border-color:rgba(154,74,74,0.5);color:#cf8e8e}
+
+  .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.5s ease infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .badge-approved .status-dot,.badge-rejected .status-dot{animation:none}
+
+  .status-message{padding:1rem;border-left:2px solid;font-size:0.78rem;line-height:1.6}
+  .msg-pending{border-color:var(--gold);color:var(--muted);background:rgba(201,168,76,0.04)}
+  .msg-approved{border-color:#5a9a6a;color:#8ecf9e;background:rgba(90,154,106,0.05)}
+  .msg-rejected{border-color:#9a4a4a;color:#cf8e8e;background:rgba(154,74,74,0.05)}
+
+  .not-found{text-align:center;padding:2rem;border:1px solid var(--border);color:var(--muted);font-size:0.82rem}
+  .not-found .icon{font-size:2rem;opacity:0.3;display:block;margin-bottom:0.8rem}
+
+  .back-link{display:block;text-align:center;margin-top:1.5rem;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s}
+  .back-link:hover{color:var(--gold)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="status-page">
+  <div class="status-wrap">
+
+    <div class="status-header">
+      <span class="icon">⚖</span>
+      <h1>Check Appointment Status</h1>
+      <p>Enter your reference number to view the current status of your appointment request.</p>
+    </div>
+
+    <div class="search-card">
+      <form method="POST" action="/status">
+        <label for="ref">Reference Number</label>
+        <div class="input-row">
+          <input type="text" id="ref" name="ref" placeholder="e.g. RSJ-123456"
+                 value="{{ request.form.get('ref','') }}" autocomplete="off" spellcheck="false"/>
+          <button type="submit" class="search-btn">Check</button>
+        </div>
+      </form>
+    </div>
+
+    {% if request.method == 'POST' %}
+      {% if appt %}
+        <div class="result-card">
+          <div class="result-header">
+            <span class="result-ref">{{ appt.ref }}</span>
+            <span class="badge-status badge-{{ appt.status }}">
+              <span class="status-dot"></span>
+              {{ appt.status | capitalize }}
+            </span>
+          </div>
+          <div class="result-body">
+            <div class="detail-grid">
+              <div class="di"><div class="dl">Client Name</div><div class="dv">{{ appt.client_name }}</div></div>
+              <div class="di"><div class="dl">Contact No.</div><div class="dv">{{ appt.contact_no }}</div></div>
+              <div class="di"><div class="dl">Requested Date &amp; Time</div><div class="dv">{{ appt.date_time.strftime('%d %b %Y, %I:%M %p') }}</div></div>
+              <div class="di"><div class="dl">Nature of Matter</div><div class="dv">{{ appt.case_type }}</div></div>
+            </div>
+
+            {% if appt.status == 'pending' %}
+              <div class="status-message msg-pending">
+                Your appointment request is currently under review. Adv. Ram S. Joshi's office will confirm or reschedule your appointment shortly. Please keep your contact number accessible.
+              </div>
+            {% elif appt.status == 'approved' %}
+              <div class="status-message msg-approved">
+                Your appointment has been <strong>approved</strong>. Please arrive 10 minutes early with all relevant documents. If you need to reschedule, contact the office at least 24 hours in advance.
+              </div>
+            {% elif appt.status == 'rejected' %}
+              <div class="status-message msg-rejected">
+                Your appointment request could not be accommodated at the requested time. We apologise for the inconvenience. Please book a new appointment at a different date or time slot.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <div class="not-found">
+          <span class="icon">?</span>
+          No appointment found with that reference number. Please double-check and try again.
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <a href="/book" class="back-link">← Book an Appointment</a>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Adv. Ram S. Joshi{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0b1629;--navy2:#112040;--gold:#c9a84c;--gold2:#e8c96d;
+      --cream:#f5f0e8;--muted:#8a9bb0;--border:rgba(201,168,76,0.2);
+      --ff-serif:'Cormorant Garamond',Georgia,serif;
+      --ff-sans:'Jost',sans-serif;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--ff-sans);background:var(--navy);color:var(--cream);min-height:100vh;font-weight:300;letter-spacing:0.01em;line-height:1.7}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.025) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(11,22,41,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-brand{text-decoration:none}
+    .nav-brand .name{font-family:var(--ff-serif);font-size:1.2rem;font-weight:600;color:var(--gold2);letter-spacing:0.04em;display:block}
+    .nav-brand .tag{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+    .nav-links{display:flex;gap:1.8rem;align-items:center}
+    .nav-links a{text-decoration:none;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);transition:color 0.25s}
+    .nav-links a:hover{color:var(--gold)}
+    .btn{display:inline-block;padding:0.6rem 1.6rem;font-family:var(--ff-sans);font-size:0.72rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all 0.25s}
+    .btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--gold)}.btn-outline:hover{border-color:var(--gold);background:rgba(201,168,76,0.07)}
+    .btn-ghost{background:transparent;border:1px solid rgba(138,155,176,0.25);color:var(--muted);font-size:0.68rem}.btn-ghost:hover{border-color:var(--muted);color:var(--cream)}
+    .btn-sm{padding:0.3rem 0.9rem;font-size:0.62rem}
+    .gold-line{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:1rem auto}
+    .gold-line.left{margin:1rem 0}
+    .flash-wrap{position:fixed;top:76px;right:1.5rem;z-index:999;display:flex;flex-direction:column;gap:0.4rem}
+    .flash{padding:0.65rem 1.1rem;font-size:0.76rem;letter-spacing:0.04em;border-left:2px solid;background:var(--navy2);animation:slideIn 0.3s ease;max-width:300px}
+    .flash.success{border-color:#5a9a6a;color:#8ecf9e}.flash.danger{border-color:#9a4a4a;color:#cf8e8e}
+    .flash.info{border-color:var(--gold);color:var(--gold2)}.flash.warning{border-color:#9a7a3a;color:#cfb06e}
+    @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+    .page{padding-top:72px;position:relative;z-index:1}
+    footer{text-align:center;padding:2rem;border-top:1px solid var(--border);font-size:0.68rem;letter-spacing:0.09em;color:var(--muted);margin-top:3rem}
+    @media(max-width:640px){nav{padding:0.9rem 1.2rem}.nav-links{gap:1rem}.hide-sm{display:none}}
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">
+    <span class="name">Adv. Ram S. Joshi</span>
+    <span class="tag">Advocate &amp; Legal Consultant</span>
+  </a>
+  <div class="nav-links">
+    <a href="/book">Book</a>
+    <a href="/status" class="hide-sm">Check Status</a>
+    {% if session.get('logged_in') %}
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+    {% else %}
+      <a href="/login" class="hide-sm">Admin</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-wrap">
+      {% for cat,msg in messages %}
+        <div class="flash {{cat}}">{{msg}}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="page">{% block content %}{% endblock %}</div>
+
+<footer>
+  <p>&copy; 2025 Adv. Ram S. Joshi &nbsp;&middot;&nbsp; All Rights Reserved</p>
+  <p style="margin-top:0.25rem;font-size:0.6rem;opacity:0.6">Practicing Law with Integrity &amp; Dedication &nbsp;&middot;&nbsp; Mumbai, Maharashtra</p>
+</footer>
+<script>
+  setTimeout(()=>{document.querySelectorAll('.flash').forEach(f=>{f.style.transition='opacity 0.4s';f.style.opacity='0';setTimeout(()=>f.remove(),400)})},4000);
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

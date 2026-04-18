@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+{% block title %}Book an Appointment — Adv. Ram S. Joshi{% endblock %}
+
+{% block head %}
+<style>
+  .page-wrap {
+    min-height: calc(100vh - 72px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* ── Left: Identity panel ── */
+  .left-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5rem 4rem 4rem 5rem;
+    position: relative;
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute; right: 0; top: 8%; bottom: 8%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  }
+
+  .eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.6rem;
+  }
+
+  .lawyer-name {
+    font-family: var(--ff-serif);
+    font-size: clamp(2.8rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.08;
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+  .lawyer-name em { font-style: italic; color: var(--gold2); }
+
+  .lawyer-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2.8rem;
+  }
+
+  .practice-list { margin-bottom: 3rem; }
+  .practice-list li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.38rem 0;
+  }
+  .practice-list li::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .info-chips {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .chip { font-size: 0.74rem; color: var(--muted); }
+  .chip span {
+    display: block;
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.2rem;
+  }
+
+  /* ── Right: Form panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5rem 5rem 4rem 4rem;
+    background: rgba(17, 32, 64, 0.32);
+    overflow-y: auto;
+  }
+
+  .form-title {
+    font-family: var(--ff-serif);
+    font-size: 1.9rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 0.25rem;
+  }
+  .form-subtitle { font-size: 0.73rem; color: var(--muted); margin-bottom: 2rem; }
+
+  /* Form controls */
+  .fg { margin-bottom: 1.25rem; }
+  .fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .fg label {
+    display: block;
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.45rem;
+  }
+
+  .fg input,
+  .fg select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    padding: 0.82rem 1rem;
+    font-family: var(--ff-sans);
+    font-size: 0.84rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.22s, background 0.22s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .fg input:focus, .fg select:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+  .fg input::placeholder { color: rgba(138,155,176,0.38); }
+  .fg select option { background: #0d1e38; color: var(--cream); }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.45) sepia(1) saturate(2);
+    cursor: pointer;
+  }
+
+  /* ── Slot grid ── */
+  .slot-shell {
+    border: 1px solid var(--border);
+    min-height: 64px;
+  }
+
+  .slot-msg {
+    padding: 1.2rem 1rem;
+    font-size: 0.72rem;
+    color: rgba(138,155,176,0.45);
+    text-align: center;
+  }
+
+  .slot-inner { padding: 1rem; }
+
+  .session-heading {
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.55rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .slot-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+  .slot-row:last-child { margin-bottom: 0; }
+
+  .slot-chip {
+    padding: 0.38rem 0.7rem;
+    font-family: var(--ff-sans);
+    font-size: 0.68rem;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.025);
+    color: var(--cream);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .slot-chip:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.07); }
+  .slot-chip.active { border-color: var(--gold); background: var(--gold); color: var(--navy); font-weight: 500; }
+  .slot-chip.taken  { opacity: 0.22; text-decoration: line-through; cursor: not-allowed; pointer-events: none; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    margin-top: 0.6rem;
+    padding: 0.95rem;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    font-family: var(--ff-sans);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--navy);
+    transition: all 0.22s;
+  }
+  .submit-btn:hover   { background: var(--gold2); transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  .note { font-size: 0.62rem; color: var(--muted); margin-top: 0.8rem; text-align: center; line-height: 1.65; }
+
+  /* Entrance animation */
+  .left-panel > * { animation: fadeUp 0.55s ease both; }
+  .eyebrow      { animation-delay: 0.05s; }
+  .lawyer-name  { animation-delay: 0.1s;  }
+  .lawyer-title { animation-delay: 0.15s; }
+  .gold-line    { animation-delay: 0.18s; }
+  .practice-list{ animation-delay: 0.22s; }
+  .info-chips   { animation-delay: 0.28s; }
+  .right-panel  { animation: fadeUp 0.55s ease 0.2s both; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 920px) {
+    .page-wrap     { grid-template-columns: 1fr; }
+    .left-panel    { padding: 3.5rem 1.5rem 2.5rem; }
+    .left-panel::after { display: none; }
+    .right-panel   { padding: 2rem 1.5rem 4rem; }
+    .fg-row        { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- ── Left: Identity ── -->
+  <div class="left-panel">
+    <p class="eyebrow">Legal Consultancy &amp; Representation</p>
+
+    <h1 class="lawyer-name">
+      Adv.<br><em></em> Ram S. Joshi</em>
+    </h1>
+    <p class="lawyer-title">B.Tech. LL.B. </p>
+
+    <div class="gold-line left"></div>
+
+    <ul class="practice-list">
+      <li>Criminal Law &amp; Defence</li>
+      <li>Civil Litigation</li>
+      <li>Family &amp; Matrimonial Law</li>
+      <li>Property &amp; Real Estate</li>
+      <li>Corporate &amp; Contract Law</li>
+    </ul>
+
+    <div class="info-chips">
+      <div class="chip"><span>Phone</span>+91 8552855011</div>
+      <div class="chip"><span>Chamber</span>Malegaon Jahangir, Maharashtra</div>
+      <div class="chip"><span>Experience</span>20+ Years</div>
+    </div>
+  </div>
+
+  <!-- ── Right: Booking form ── -->
+  <div class="right-panel">
+    <h2 class="form-title">Request an Appointment</h2>
+    <p class="form-subtitle">All consultations are strictly confidential.</p>
+
+    <form method="POST" action="/book" id="bookForm">
+
+      <div class="fg-row">
+        <div class="fg">
+          <label for="client_name">Full Name</label>
+          <input type="text" id="client_name" name="client_name"
+                 placeholder="Your full name" required autocomplete="name"/>
+        </div>
+        <div class="fg">
+          <label for="contact_no">Contact Number</label>
+          <input type="tel" id="contact_no" name="contact_no"
+                 placeholder="+91 XXXXX XXXXX" required autocomplete="tel"/>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label for="case_type">Nature of Matter</label>
+        <select id="case_type" name="case_type" required>
+          <option value="" disabled selected>Select case type</option>
+          <option value="Criminal">Criminal Law</option>
+          <option value="Civil">Civil Litigation</option>
+          <option value="Family">Family &amp; Matrimonial</option>
+          <option value="Property">Property &amp; Real Estate</option>
+          <option value="Corporate">Corporate &amp; Contract</option>
+          <option value="Other">Other / General Consultation</option>
+        </select>
+      </div>
+
+      <div class="fg">
+        <label for="appt_date">Select Date</label>
+        <input type="date" id="appt_date" name="appt_date" required/>
+      </div>
+
+      <div class="fg">
+        <label>Select Time Slot</label>
+        <div class="slot-shell" id="slotShell">
+          <div class="slot-msg" id="slotMsg">Please select a date above</div>
+        </div>
+        <input type="hidden" id="appt_slot" name="appt_slot"/>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        Schedule Consultation
+      </button>
+
+      <p class="note">
+        Your request will be reviewed and confirmed by Adv. Joshi's office.
+        You will receive a reference number to track your booking status.
+      </p>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Set minimum date to today
+  (function () {
+    var d = new Date();
+    var yyyy = d.getFullYear();
+    var mm   = String(d.getMonth() + 1).padStart(2, '0');
+    var dd   = String(d.getDate()).padStart(2, '0');
+    document.getElementById('appt_date').min = yyyy + '-' + mm + '-' + dd;
+  })();
+
+  var dateInput  = document.getElementById('appt_date');
+  var slotShell  = document.getElementById('slotShell');
+  var slotMsg    = document.getElementById('slotMsg');
+  var hiddenSlot = document.getElementById('appt_slot');
+  var submitBtn  = document.getElementById('submitBtn');
+
+  function setMsg(text) {
+    slotShell.innerHTML = '<div class="slot-msg">' + text + '</div>';
+  }
+
+  function renderSlots(slots) {
+    if (!slots || slots.length === 0) {
+      setMsg('No slots available for this date.');
+      return;
+    }
+
+    var morning = slots.filter(function(s){ return s.session === 'Morning'; });
+    var evening = slots.filter(function(s){ return s.session === 'Evening'; });
+
+    var html = '<div class="slot-inner">';
+
+    if (morning.length) {
+      html += '<div class="session-heading">Morning &mdash; 9:00 AM to 10:30 AM</div>';
+      html += '<div class="slot-row">';
+      morning.forEach(function(s) {
+        html += '<div class="slot-chip' + (s.taken ? ' taken' : '') + '" data-val="' + s.value + '">' + s.label + '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (evening.length) {
+      html += '<div class="session-heading">Evening &mdash; 6:00 PM to 9:00 PM</div>';
+      html += '<div class="slot-row">';
+      evening.forEach(function(s) {
+        html += '<div class="slot-chip' + (s.taken ? ' taken' : '') + '" data-val="' + s.value + '">' + s.label + '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    slotShell.innerHTML = html;
+
+    // Attach click listeners
+    slotShell.querySelectorAll('.slot-chip:not(.taken)').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        slotShell.querySelectorAll('.slot-chip').forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        hiddenSlot.value = chip.dataset.val;
+        submitBtn.disabled = false;
+      });
+    });
+  }
+
+  dateInput.addEventListener('change', function() {
+    var d = dateInput.value;
+    if (!d) return;
+
+    // Reset
+    hiddenSlot.value = '';
+    submitBtn.disabled = true;
+    setMsg('Loading available slots…');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/slots?date=' + encodeURIComponent(d));
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          renderSlots(data);
+        } catch(e) {
+          setMsg('Could not parse slot data. Please refresh and try again.');
+        }
+      } else {
+        setMsg('Server error loading slots. Please try again.');
+      }
+    };
+    xhr.onerror = function() {
+      setMsg('Network error. Make sure the server is running.');
+    };
+    xhr.send();
+  });
+</script>
+{% endblock %}
